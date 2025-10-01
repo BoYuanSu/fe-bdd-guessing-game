@@ -7,5 +7,11 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
-  }
+  },
+  "cucumber.features": [
+    "src/**/*.feature",
+  ],
+  "cucumber.glue": [
+    "src/**/feature/**/*.spec.tsx",
+  ]
 }
