@@ -1,0 +1,100 @@
+instructions:
+  # ===================================================================
+  # Given (測試前提與狀態設定)
+  # ===================================================================
+  - name: Setup API Mock Data
+    format: 系統 API 回應以下 <entityName>\n<DataTable>
+    constraints:
+      - <entityName> 必須是前端會用到的資料實體名稱。
+      - DataTable 的欄位與值應對應到 API 回應的資料結構。
+    example: |
+      Given 系統 API 回應以下 群組
+        | id | name    | members_count |
+        | 1  | Group A | 10            |
+    situation: 用於在測試開始前，設定 Mock Server (MSW) 以準備前端所需的 API 回應資料。
+    implementation_hint: |
+      - 使用 MSW (Mock Service Worker) 來攔截 API 請求。
+      - 根據 <entityName> 找到對應的 API endpoint (例如 /api/groups)。
+      - DataTable 可以是「水平格式」(標頭為 key) 或「垂直格式」(| fieldKey | value |)。程式碼需要能處理這兩種情況，將其轉換為物件陣列。
+      - 使用 `server.use()` 和 `http.get()` 或 `http.post()` 來設定 handler，其回應內容為轉換後的物件陣列。
+
+  - name: Setup Store Data
+    format: 系統狀態 (Store) 中包含以下資料\n<DataTable>
+    constraints:
+      - DataTable 應包含 `key` 和 `value` 兩欄。
+      - `key` 對應狀態管理的 atom 或 state 的名稱。
+      - `value` 是要設定的狀態值 (可以是 JSON 字串)。
+    example: |
+      Given 系統狀態 (Store) 中包含以下資料
+        | key             | value            |
+        | permissionsAtom | '["GROUP_EDIT"]' |
+    situation: 用於設定前端全域狀態 (如 Jotai, Redux) 的初始值。
+    implementation_hint: |
+      - 在 `render` 測試元件時，為其提供一個客製化的 Provider。
+      - 建立一個預先填入 DataTable 中定義資料的 Jotai <ScopeProvider> 或 Redux <Provider>。
+      - 將 DataTable 中的 `value` (JSON 字串) 解析後，作為對應 atom 或 state 的初始值。
+
+  # ===================================================================
+  # When (使用者行為)
+  # ===================================================================
+  - name: Render Component
+    format: 使用者查看 <componentName>
+    constraints:
+      - <componentName> 是要進行測試的 React 元件或頁面的名稱。
+    example: |
+      When 使用者查看 群組列表頁面
+    situation: 用於在測試環境中渲染目標元件。這是所有互動和驗證的起點。
+    implementation_hint: |
+      - 這是測試的起點，應呼叫 `@testing-library/react` 的 `render()` 函式。
+      - `render(<YourComponent />);`
+      - 如果需要，傳入 props 或使用 Provider 包裹元件。
+
+  - name: User Interacts
+    format: 使用者執行以下互動\n<DataTable>
+    constraints:
+      - DataTable 必須包含 `interaction`, `element`, `value` 三欄。
+      - `interaction`: 互動類型，如 '輸入', '點擊', '選擇', '選擇日期範圍'。
+      - `element`: 用於定位元素的文字，通常是 label 或按鈕文字。
+      - `value`: 互動所需的值。對於 '點擊'，此欄位可留空。對於 '選擇日期範圍'，應為 'YYYY-MM-DD to YYYY-MM-DD' 格式。
+    example: |
+      When 使用者執行以下互動
+        | interaction   | element    | value                      |
+        | 輸入           | 群组名称   | My Test Group              |
+        | 選擇           | 群组状态   | 正常                       |
+        | 選擇日期範圍    | 创建时间   | 2023-01-01 to 2023-12-31   |
+        | 點擊           | 搜 索      |                            |
+    situation: 通用的使用者互動指令，涵蓋大部分 UI 操作。
+    implementation_hint: |
+      - 遍歷 DataTable 的每一行，根據 `interaction` 欄位的值執行不同操作。
+      - **'點擊'**: 使用 `userEvent.click(screen.getByRole('button', { name: /<element>/i }))`。
+      - **'輸入'**: 使用 `userEvent.type(screen.getByLabelText('<element>'), '<value>')`。
+      - **'選擇'**: 先點擊 Select 元件 `userEvent.click(screen.getByLabelText('<element>'))`，然後點擊出現的選項 `userEvent.click(screen.getByRole('option', { name: '<value>' }))`。
+      - 優先使用 `getByLabelText` 和 `getByRole` 進行元素定位。
+      - **'選擇日期範圍'**: 解析 `<value>` 中的起始和結束日期。點擊日期選擇器，然後分別點擊對應的日期元素。
+
+  # ===================================================================
+  # Then (結果驗證)
+  # ===================================================================
+  - name: Verify DOM State
+    format: 畫面應符合以下狀態\n<DataTable>
+    constraints:
+      - DataTable 必須包含 `assertion`, `element`, `value` 三欄。
+      - `assertion`: 斷言類型，如 '顯示', '不顯示', '包含文字', '擁有值', '可點擊'。
+      - `element`: 用於定位元素的文字 (label, role, text)。
+      - `value`: 斷言所需的值。對於 '顯示'/'不顯示'，此欄位可留空。
+    example: |
+      Then 畫面應符合以下狀態
+        | assertion | element      | value                      |
+        | 顯示      | '儲存' 按鈕  |                            |
+        | 不顯示    | '刪除' 按鈕  |                            |
+        | 包含文字  | 總計         | 1,234                      |
+        | 擁有值    | 使用者名稱   | admin                      |
+        | 可點擊    | 轉讓次數     |                            |
+    situation: 通用的、原子的 DOM 狀態驗證指令。
+    implementation_hint: |
+      - 遍歷 DataTable 的每一行，根據 `assertion` 欄位的值執行不同斷言。
+      - **'顯示'**: `expect(screen.getByText('<element>')).toBeInTheDocument()` 或 `toBeVisible()`。
+      - **'不顯示'**: `expect(screen.queryByText('<element>')).not.toBeInTheDocument()`。
+      - **'包含文字'**: `expect(screen.getByText(/<element>/i).parentElement).toHaveTextContent('<value>')`。
+      - **'擁有值'**: `expect(screen.getByLabelText('<element>')).toHaveValue('<value>')`。
+      - 根據情境靈活選用 `getBy`, `findBy`, `queryBy`。
