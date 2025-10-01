@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest --project bdd",
     "agent:test": "vitest --project bdd --run",
+    "agent:lint-fix": "prettier --write",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -30,6 +31,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "jsdom": "^27.0.0",
+    "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite-tsconfig-paths": "^5.1.4",
