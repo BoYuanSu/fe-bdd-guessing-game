@@ -1,11 +1,16 @@
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
 import { vi, expect } from 'vitest';
 import { JoinGame } from '../JoinGame';
 
 const feature = await loadFeature('./JoinGame.feature');
 
-describeFeature(feature, ({ Scenario }) => {
+describeFeature(feature, ({ Scenario, BeforeEachScenario }) => {
+  const user = userEvent.setup();
+  BeforeEachScenario(() => {
+    cleanup();
+  });
   Scenario('Successful game join', ({ Given, When, And, Then }) => {
     let onJoinGameMock: ReturnType<typeof vi.fn>;
     let playerName: string;
@@ -20,23 +25,23 @@ describeFeature(feature, ({ Scenario }) => {
       expect(screen.getByRole('button', { name: 'Join' })).toBeInTheDocument();
     });
 
-    When('the user click label {string} and input {string}', (ctx, labelText, inputValue) => {
+    When('the user click label {string} and input {string}', async (ctx, labelText, inputValue) => {
       playerName = inputValue;
       // 點擊 label 來聚焦輸入欄位
       const label = screen.getByText(labelText);
-      fireEvent.click(label);
+      await user.click(label);
 
       // 輸入 "Alice"
       const nameInput = screen.getByLabelText('Player Name');
-      fireEvent.change(nameInput, { target: { value: playerName } });
+      await user.type(nameInput, playerName);
 
       // 驗證輸入值
       expect(nameInput).toHaveValue(playerName);
     });
 
-    And('the user clicks the {string} button', (ctx, buttonText) => {
+    And('the user clicks the {string} button', async (ctx, buttonText) => {
       const joinButton = screen.getByRole('button', { name: buttonText });
-      fireEvent.click(joinButton);
+      await user.click(joinButton);
     });
 
     Then('the user should be taken to the game lobby', () => {
