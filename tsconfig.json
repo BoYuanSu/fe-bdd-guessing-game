@@ -35,14 +35,6 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "src/**/*.{spec,test}.ts*",
-    "src/**/*.spec.ts*",
-    "src/**/*.test.ts*"
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.test.json"
-    }
+    "node_modules"
   ]
 }
