@@ -14,6 +14,7 @@ describeFeature(feature, ({ Scenario, BeforeEachScenario }) => {
   Scenario('Successful game join', ({ Given, When, And, Then }) => {
     let onJoinGameMock: ReturnType<typeof vi.fn>;
     let playerName: string;
+    let gameId: string;
 
     Given('a user is on the Join Game page', () => {
       onJoinGameMock = vi.fn();
@@ -39,6 +40,17 @@ describeFeature(feature, ({ Scenario, BeforeEachScenario }) => {
       expect(nameInput).toHaveValue(playerName);
     });
 
+    And('the user click label {string} and input {string}', async (ctx, labelText, inputValue) => {
+      gameId = inputValue;
+      const label = screen.getByText(labelText);
+      await user.click(label);
+
+      const gameIdInput = screen.getByLabelText('Game ID');
+      await user.type(gameIdInput, gameId);
+
+      expect(gameIdInput).toHaveValue(gameId);
+    });
+
     And('the user clicks the {string} button', async (ctx, buttonText) => {
       const joinButton = screen.getByRole('button', { name: buttonText });
       await user.click(joinButton);
@@ -46,7 +58,10 @@ describeFeature(feature, ({ Scenario, BeforeEachScenario }) => {
 
     Then('the user should be taken to the game lobby', () => {
       // 驗證 onJoinGame 回調函式被呼叫，且參數正確
-      expect(onJoinGameMock).toHaveBeenCalledWith(playerName);
+      expect(onJoinGameMock).toHaveBeenCalledWith({
+        playerName,
+        gameId,
+      });
       expect(onJoinGameMock).toHaveBeenCalledTimes(1);
     });
   });
