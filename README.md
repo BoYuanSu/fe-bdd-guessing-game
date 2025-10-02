@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 猜數字遊戲 (1A2B Guessing Game)
 
-## Getting Started
+這是一個使用 Next.js 15 和 TypeScript 開發的多人猜數字遊戲，目標是採用 AIxBDD 驅動開發方法，建立前端領域的 AI 工作流標準。
 
-First, run the development server:
+## 技術堆疊
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **前端框架**: Next.js 15 (App Router) + React 19
+- **語言**: TypeScript (strict mode)
+- **樣式**: TailwindCSS v4
+- **測試**: Vitest + [@amiceli/vitest-cucumber](https://vitest-cucumber.miceli.click/) (BDD)
+- **建構工具**: Turbopack (Next.js 原生)
+
+## 專案結構
+
+```
+src/
+├── app/                    # Next.js App Router 頁面
+├── components/             # 可重用元件
+│   └── [ComponentName]/    # 元件資料夾
+│       ├── index.ts        # 匯出檔案
+│       ├── ComponentName.tsx
+│       └── feature/        # BDD 測試檔案
+│           ├── ComponentName.feature
+│           └── ComponentName.spec.tsx
+tests/                      # 全域測試配置
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 開始使用
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 環境需求
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js (建議版本 22 或更高版本，根據 [.nvmrc](.nvmrc) 檔案)
+- npm
 
-## Learn More
+### 安裝
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 可用指令
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **啟動開發伺服器**:
+  ```bash
+  npm run dev
+  ```
 
-## Deploy on Vercel
+- **建立生產版本**:
+  ```bash
+  npm run build
+  ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **執行 BDD 測試**:
+  ```bash
+  npm test
+  ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **程式碼風格檢查**:
+  ```bash
+  npm run lint
+  ```
+
+- **TypeScript 型別檢查**:
+  ```bash
+  npm run typecheck
+  ```
+
+## Credit
+
+本 Repo 之相關素材參考：https://waterballsa.tw/ai-bdd 的內容
